@@ -1,7 +1,9 @@
 package com.zest.dynamic.theme.ui
 
 import android.content.Context
+import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import androidx.annotation.DrawableRes
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.ColorScheme
 import androidx.compose.material3.MaterialTheme
@@ -16,10 +18,11 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.platform.LocalContext
 import androidx.palette.graphics.Palette
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import material.util.color.scheme.Scheme
 
 @Composable
@@ -27,7 +30,7 @@ fun DynamicTheme(
     state: DynamicThemeState,
     content: @Composable () -> Unit,
 ) {
-    val scheme = rememberColorSchemeByColor(state.primaryColor)
+    val scheme = rememberColorScheme(state.primaryColor)
     MaterialTheme(
         colorScheme = scheme,
         content = content
@@ -38,24 +41,46 @@ fun DynamicTheme(
 fun rememberDynamicThemeState(
     initialPrimaryColor: Color = MaterialTheme.colorScheme.primary,
 ): DynamicThemeState {
-    val coroutineScope = rememberCoroutineScope()
-    return remember { DynamicThemeState(initialPrimaryColor, coroutineScope) }
+    val context = LocalContext.current
+    return remember { DynamicThemeState(initialPrimaryColor, context) }
+}
+
+@Composable
+fun rememberDynamicThemeState(
+    initialPrimaryColor: Int,
+): DynamicThemeState {
+    return rememberDynamicThemeState(Color(initialPrimaryColor))
 }
 
 @Stable
-class DynamicThemeState(initialPrimaryColor: Color, private val coroutineScope: CoroutineScope) {
+class DynamicThemeState(
+    initialPrimaryColor: Color,
+    private val context: Context,
+) {
+
     var primaryColor: Color by mutableStateOf(initialPrimaryColor)
-    fun setColorByImage(context: Context, imageRes: Int) {
-        coroutineScope.launch(Dispatchers.IO) {
-            val bitmap = BitmapFactory.decodeResource(context.resources, imageRes)
-            val palette = Palette.from(bitmap).generate()
-            palette.dominantSwatch?.rgb?.let { primaryColor = Color(it) }
+
+    var primaryColorArgb: Int
+        set(value) {
+            primaryColor = Color(value)
         }
+        get() = primaryColor.toArgb()
+
+    suspend fun updateColorByImage(@DrawableRes imageRes: Int) {
+        withContext(Dispatchers.IO) {
+            val bitmap = BitmapFactory.decodeResource(context.resources, imageRes)
+            updateColorByImage(bitmap)
+        }
+    }
+
+    suspend fun updateColorByImage(bitmap: Bitmap) {
+        val palette = Palette.from(bitmap).generate()
+        palette.dominantSwatch?.rgb?.let { primaryColor = Color(it) }
     }
 }
 
 @Composable
-private fun rememberColorSchemeByColor(color: Color): ColorScheme {
+private fun rememberColorScheme(color: Color): ColorScheme {
     val isDarkTheme = isSystemInDarkTheme()
     val colorArgb = color.toArgb()
     return remember(color) {
