@@ -1,23 +1,22 @@
 package com.zest.dynamic.theme.ui.screens
 
-import android.content.Context
-import android.graphics.BitmapFactory
-import androidx.compose.foundation.layout.*
-import androidx.compose.runtime.*
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
-import androidx.palette.graphics.Palette
-import com.zest.dynamic.theme.ui.DynamicTheme
-import com.zest.dynamic.theme.ui.rememberDynamicThemeState
+import com.zest.dynamic.theme.DynamicTheme
+import com.zest.dynamic.theme.rememberDynamicThemeState
 import com.zest.dynamic.theme.ui.view.ComponentsLayout
 import com.zest.dynamic.theme.ui.view.ImageList
+import kotlinx.coroutines.launch
 
 @Composable
 fun ImageListScreen() {
-    val context = LocalContext.current
     val themeState = rememberDynamicThemeState()
+    val coroutineScope = rememberCoroutineScope()
     DynamicTheme(themeState) {
         Column(
             modifier = Modifier
@@ -27,21 +26,13 @@ fun ImageListScreen() {
             // Компонент со списком изображений из ресурсов
             ImageList(
                 onImageSelect = { resId ->
-                    // Извлекаем доминантный цвет из картинки
-                    val domainColorRgb = exportDominantRgb(context, resId)
-                    // Устанавливаем его как основной
-                    domainColorRgb?.let { themeState.primaryColor = Color(it) }
+                    coroutineScope.launch {
+                        themeState.updateColorByImage(resId)
+                    }
                 }
             )
             // Компонент с демо элементами
             ComponentsLayout(Modifier.padding(top = 16.dp))
         }
     }
-}
-
-
-fun exportDominantRgb(context: Context, imageRes: Int): Int? {
-    val bitmap = BitmapFactory.decodeResource(context.resources, imageRes)
-    val palette = Palette.from(bitmap).generate()
-    return palette.dominantSwatch?.rgb
 }

@@ -1,4 +1,4 @@
-package com.zest.dynamic.theme.ui
+package com.zest.dynamic.theme
 
 import android.content.Context
 import android.graphics.Bitmap
@@ -14,19 +14,22 @@ import androidx.compose.runtime.Stable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalContext
 import androidx.palette.graphics.Palette
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import material.util.color.scheme.Scheme
 
+/**
+ * DynamicTheme allows you to dynamically change the color scheme of the content hierarchy.
+ * To do this you just need to update [DynamicThemeState].
+ * @param state - current instance of [DynamicThemeState]
+ * */
 @Composable
-fun DynamicTheme(
+public fun DynamicTheme(
     state: DynamicThemeState,
     content: @Composable () -> Unit,
 ) {
@@ -37,43 +40,49 @@ fun DynamicTheme(
     )
 }
 
+/**
+ * Creates and remember [DynamicThemeState] instance
+ * */
 @Composable
-fun rememberDynamicThemeState(
+public fun rememberDynamicThemeState(
     initialPrimaryColor: Color = MaterialTheme.colorScheme.primary,
 ): DynamicThemeState {
     val context = LocalContext.current
     return remember { DynamicThemeState(initialPrimaryColor, context) }
 }
 
+/**
+ * Creates and remember [DynamicThemeState] instance
+ * */
 @Composable
-fun rememberDynamicThemeState(
+public fun rememberDynamicThemeState(
     initialPrimaryColor: Int,
 ): DynamicThemeState {
     return rememberDynamicThemeState(Color(initialPrimaryColor))
 }
 
 @Stable
-class DynamicThemeState(
+public class DynamicThemeState(
     initialPrimaryColor: Color,
     private val context: Context,
 ) {
 
-    var primaryColor: Color by mutableStateOf(initialPrimaryColor)
+    public var primaryColor: Color by mutableStateOf(initialPrimaryColor)
 
-    var primaryColorArgb: Int
+    public var primaryColorArgb: Int
         set(value) {
             primaryColor = Color(value)
         }
         get() = primaryColor.toArgb()
 
-    suspend fun updateColorByImage(@DrawableRes imageRes: Int) {
+    public suspend fun updateColorByImage(@DrawableRes imageRes: Int) {
         withContext(Dispatchers.IO) {
             val bitmap = BitmapFactory.decodeResource(context.resources, imageRes)
             updateColorByImage(bitmap)
         }
     }
 
-    suspend fun updateColorByImage(bitmap: Bitmap) {
+    public fun updateColorByImage(bitmap: Bitmap) {
         val palette = Palette.from(bitmap).generate()
         palette.dominantSwatch?.rgb?.let { primaryColor = Color(it) }
     }
@@ -92,7 +101,7 @@ private fun rememberColorScheme(color: Color): ColorScheme {
     }
 }
 
-fun Scheme.toDarkThemeColorScheme(): ColorScheme {
+private fun Scheme.toDarkThemeColorScheme(): ColorScheme {
     return darkColorScheme(
         primary = Color(primary),
         onPrimary = Color(onPrimary),
@@ -126,7 +135,7 @@ fun Scheme.toDarkThemeColorScheme(): ColorScheme {
     )
 }
 
-fun Scheme.toLightThemeColorScheme(): ColorScheme {
+private fun Scheme.toLightThemeColorScheme(): ColorScheme {
     return lightColorScheme(
         primary = Color(primary),
         onPrimary = Color(onPrimary),

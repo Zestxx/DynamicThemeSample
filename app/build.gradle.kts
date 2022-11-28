@@ -53,6 +53,5 @@ dependencies {
     implementation("androidx.navigation:navigation-runtime-ktx")
     // Additional dependencies
     implementation("io.coil-kt:coil-compose:2.2.2")
-    implementation(files("libs/material-color-util.jar"))
-    implementation("androidx.palette:palette:1.0.0")
+    implementation(project(":dynamic_theme"))
 }
