@@ -6,8 +6,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import com.zest.dynamic.theme.ui.DynamicTheme
-import com.zest.dynamic.theme.ui.rememberDynamicThemeState
+import com.zest.dynamic.theme.DynamicTheme
+import com.zest.dynamic.theme.rememberDynamicThemeState
 import com.zest.dynamic.theme.ui.view.ComponentsLayout
 
 @Composable
