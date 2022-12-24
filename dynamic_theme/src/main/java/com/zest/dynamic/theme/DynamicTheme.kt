@@ -7,8 +7,6 @@ import androidx.annotation.DrawableRes
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.ColorScheme
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.darkColorScheme
-import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.getValue
@@ -94,49 +92,15 @@ private fun rememberColorScheme(color: Color): ColorScheme {
     val colorArgb = color.toArgb()
     return remember(color) {
         if (isDarkTheme) {
-            Scheme.darkContent(colorArgb).toDarkThemeColorScheme()
+            Scheme.darkContent(colorArgb)
         } else {
-            Scheme.lightContent(colorArgb).toLightThemeColorScheme()
-        }
+            Scheme.lightContent(colorArgb)
+        }.toColorScheme()
     }
 }
 
-private fun Scheme.toDarkThemeColorScheme(): ColorScheme {
-    return darkColorScheme(
-        primary = Color(primary),
-        onPrimary = Color(onPrimary),
-        primaryContainer = Color(primaryContainer),
-        onPrimaryContainer = Color(onPrimaryContainer),
-        inversePrimary = Color(inversePrimary),
-        secondary = Color(secondary),
-        onSecondary = Color(onSecondary),
-        secondaryContainer = Color(secondaryContainer),
-        onSecondaryContainer = Color(onSecondaryContainer),
-        tertiary = Color(tertiary),
-        onTertiary = Color(onTertiary),
-        tertiaryContainer = Color(tertiaryContainer),
-        onTertiaryContainer = Color(onTertiaryContainer),
-        background = Color(background),
-        onBackground = Color(onBackground),
-        surface = Color(surface),
-        onSurface = Color(onSurface),
-        surfaceVariant = Color(surfaceVariant),
-        onSurfaceVariant = Color(onSurfaceVariant),
-        surfaceTint = Color(surfaceVariant),
-        inverseSurface = Color(inverseSurface),
-        inverseOnSurface = Color(inverseOnSurface),
-        error = Color(error),
-        onError = Color(onError),
-        errorContainer = Color(errorContainer),
-        onErrorContainer = Color(onErrorContainer),
-        outline = Color(outline),
-        outlineVariant = Color(outlineVariant),
-        scrim = Color(scrim),
-    )
-}
-
-private fun Scheme.toLightThemeColorScheme(): ColorScheme {
-    return lightColorScheme(
+private fun Scheme.toColorScheme(): ColorScheme {
+    return ColorScheme(
         primary = Color(primary),
         onPrimary = Color(onPrimary),
         primaryContainer = Color(primaryContainer),
